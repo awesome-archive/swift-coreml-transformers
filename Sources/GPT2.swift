@@ -21,9 +21,9 @@ class GPT2 {
         case topP(Double)
     }
     
-    private let model = gpt2_512_1()
+    private let model = distilgpt2_64_6()
     public let tokenizer = GPT2Tokenizer()
-    public let seqLen = 512
+    public let seqLen = 64
     private let strategy: DecodingStrategy
     
     init(strategy: DecodingStrategy = .greedy) {
@@ -75,7 +75,7 @@ class GPT2 {
     /// Will generate next `nTokens` (defaults to 10).
     /// Calls an incremental `callback` for each new token, then returns the generated string at the end.
     ///
-    func generate(text: String, nTokens: Int = 10, callback: ((String) -> Void)?) -> String {
+    func generate(text: String, nTokens: Int = 10, callback: ((String, Double) -> Void)?) -> String {
         var tokens = tokenizer.encode(text: text)
         var newTokens: [Int] = []
         for i in 0..<nTokens {
@@ -87,7 +87,7 @@ class GPT2 {
             newTokens.append(nextToken)
             print("🦄 <\(time)s>", i, nextToken, tokens.count)
             callback?(
-                tokenizer.decode(tokens: newTokens)
+                tokenizer.decode(tokens: newTokens), time
             )
         }
         return tokenizer.decode(tokens: newTokens)
